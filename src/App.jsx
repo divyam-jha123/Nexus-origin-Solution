@@ -379,6 +379,7 @@ export default function App() {
               <button
                 key={cat.id}
                 className={`service-tab ${activeCategory === cat.id ? 'active' : ''}`}
+                data-category={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
               >
                 {cat.label}
