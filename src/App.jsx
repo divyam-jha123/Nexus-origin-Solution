@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
+import logo from './assets/logo.jpeg';
 import {
   Users, Building2, Cpu, ShieldCheck, HardHat, HeartPulse, Truck,
   UtensilsCrossed, Briefcase, PhoneCall, Mail, MapPin, Clock,
@@ -208,7 +209,7 @@ export default function App() {
       <header className={`navbar ${navScrolled ? 'scrolled' : ''}`}>
         <div className="container nav-inner">
           <div className="logo" onClick={() => scrollTo('hero')}>
-            <img src="/src/assets/logo.jpeg" alt="Nexus Origin Solution" className="brand-logo" />
+            <img src={logo} alt="Nexus Origin Solution" className="brand-logo" />
             <div className="logo-text">
               <div className="logo-name">Nexus Origin Solution</div>
               <div className="logo-tag">Manpower · IT · AI Services</div>
@@ -560,7 +561,7 @@ export default function App() {
           <div className="footer-grid">
             <div>
               <div className="footer-brand">
-                <img src="/src/assets/logo.jpeg" alt="Nexus Origin Solution" className="brand-logo brand-logo-small" />
+                <img src={logo} alt="Nexus Origin Solution" className="brand-logo brand-logo-small" />
                 <strong>Nexus Origin Solution</strong>
               </div>
               <p>
