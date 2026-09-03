@@ -582,7 +582,7 @@ export default function App() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 40 }}>
-            <button className="btn-primary" style={{ fontSize: 16, padding: '14px 32px' }} onClick={() => setShowRequestModal(true)}>
+            <button className="btn-primary" style={{ fontSize: '1rem', padding: '14px 32px' }} onClick={() => setShowRequestModal(true)}>
               Submit a Requirement Form <Send size={18} />
             </button>
           </div>
@@ -829,10 +829,10 @@ export default function App() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
                   <h2>Requirements ({filteredAdmin.length})</h2>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="btn-outline" onClick={exportToExcel} style={{ fontSize: 12, padding: '8px 16px' }}>
+                    <button className="btn-outline" onClick={exportToExcel} style={{ fontSize: 'var(--text-meta)', padding: '8px 16px' }}>
                       <Download size={14} /> Excel
                     </button>
-                    <button className="btn-outline" onClick={exportToPDF} style={{ fontSize: 12, padding: '8px 16px' }}>
+                    <button className="btn-outline" onClick={exportToPDF} style={{ fontSize: 'var(--text-meta)', padding: '8px 16px' }}>
                       <Download size={14} /> PDF
                     </button>
                   </div>
@@ -840,7 +840,7 @@ export default function App() {
                 <input className="form-input" placeholder="Search..." value={adminSearch}
                   onChange={e => setAdminSearch(e.target.value)} style={{ marginBottom: 16 }} />
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', fontSize: 13, borderCollapse: 'collapse' }}>
+                  <table style={{ width: '100%', fontSize: 'var(--text-sm)', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid var(--sand)', textAlign: 'left' }}>
                         <th style={{ padding: 8 }}>Company</th>
@@ -855,7 +855,7 @@ export default function App() {
                       {filteredAdmin.map(req => (
                         <tr key={req.id} style={{ borderBottom: '1px solid var(--sand)' }}>
                           <td style={{ padding: 8, fontWeight: 600 }}>{req.companyName}</td>
-                          <td style={{ padding: 8 }}>{req.contactPerson}<br /><span style={{ color: '#C05621', fontSize: 11 }}>{req.phone}</span></td>
+                          <td style={{ padding: 8 }}>{req.contactPerson}<br /><span style={{ color: '#C05621', fontSize: 'var(--text-micro)' }}>{req.phone}</span></td>
                           <td style={{ padding: 8 }}>{req.jobPosition}</td>
                           <td style={{ padding: 8 }}>{req.employeesRequired}</td>
                           <td style={{ padding: 8 }}>{req.city}</td>

@@ -6,7 +6,9 @@
   --black-soft: #171717;
   --charcoal: #171717;
   --slate: #2d2d2d;
-  --muted: #6b7280;
+  /* Body copy stays at 14px by choice, so secondary text needs more
+     contrast than the old #6b7280, which sat at 4.52:1 on the hero. */
+  --muted: #5b6472;
   --line: #e5e7eb;
   --paper: #f8f7f5;
   --white: #ffffff;
@@ -46,6 +48,23 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-7: 48px;
+
+  /* Type roles. Replaces 24 ad-hoc size literals that mixed px, rem and
+     clamp with no relationship between steps. All rem so the sizes honour
+     the reader's browser font-size setting. */
+  --text-micro: 0.6875rem;   /* 11px  logo tag, legal */
+  --text-meta: 0.75rem;      /* 12px  labels, captions */
+  --text-sm: 0.8125rem;      /* 13px  inline links, tabs */
+  --text-body: 0.875rem;     /* 14px  body copy and default UI */
+  --text-md: 0.9375rem;      /* 15px  emphasised UI, list items */
+  --text-lead: 1.0625rem;    /* 17px  hero and section intros */
+  --text-subtitle: 1.15rem;  /* 18px  card titles */
+  --text-lg: 1.25rem;        /* 20px  stat values, step numbers */
+  --text-xl: 1.5rem;         /* 24px  modal titles */
+  --text-2xl: 1.75rem;       /* 28px  hero stat figures */
+  --display-xs: 2rem;        /* 32px  banner heading */
+  --display-sm: clamp(1.75rem, 4vw, 2.75rem);
+  --display-lg: clamp(2.2rem, 5vw, 3.5rem);
 }
 
 * {
@@ -104,8 +123,17 @@ body {
 /* Headings inherited the body's 1.6 line-height, which left card titles and
    section headings visibly untethered from the text beneath them. */
 h1, h2, h3, h4, h5, h6 {
+  /* Three weight tiers carry the hierarchy: 700 headings, 600 UI labels
+     and controls, 400 prose. Previously almost everything sat at 700. */
+  font-weight: 700;
   line-height: 1.2;
   text-wrap: balance;
+  /* Poppins sets loose at display sizes; nothing here had tracking at all. */
+  letter-spacing: -0.01em;
+}
+
+h1, .display, .section-title {
+  letter-spacing: -0.02em;
 }
 
 h3, h4, h5, h6 {
@@ -133,7 +161,7 @@ p { text-wrap: pretty; }
 
 .section-title {
   font-family: var(--font-heading);
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-size: var(--display-sm);
   color: var(--black);
   line-height: 1.2;
   margin-bottom: 16px;
@@ -141,9 +169,9 @@ p { text-wrap: pretty; }
 
 .section-desc {
   color: var(--muted);
-  font-size: 1.05rem;
+  font-size: var(--text-lead);
   max-width: 600px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* Navbar */
@@ -218,11 +246,12 @@ p { text-wrap: pretty; }
 }
 
 .logo-tag {
-  font-size: 10px;
+  font-size: var(--text-micro);
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+  margin-top: 4px;
 }
 
 .nav-links {
@@ -235,8 +264,8 @@ p { text-wrap: pretty; }
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--text-body);
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: color 0.2s;
@@ -254,8 +283,8 @@ p { text-wrap: pretty; }
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--text-body);
+  font-weight: 600;
   color: var(--white);
   text-decoration: none;
 }
@@ -264,8 +293,8 @@ p { text-wrap: pretty; }
 .btn-primary {
   background: linear-gradient(135deg, var(--black) 0%, #1a1a1a 100%);
   color: white;
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: var(--text-body);
   padding: 12px 24px;
   border-radius: 10px;
   border: none;
@@ -287,8 +316,8 @@ p { text-wrap: pretty; }
 .btn-secondary {
   background: var(--black);
   color: white;
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: var(--text-body);
   padding: 12px 24px;
   border-radius: 10px;
   border: none;
@@ -307,7 +336,7 @@ p { text-wrap: pretty; }
   background: transparent;
   color: var(--black);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--text-body);
   padding: 12px 24px;
   border-radius: 10px;
   border: 2px solid var(--line);
@@ -359,7 +388,7 @@ p { text-wrap: pretty; }
   border: 1px solid var(--line);
   padding: 8px 16px;
   border-radius: 50px;
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--black);
   margin-bottom: 24px;
@@ -367,7 +396,7 @@ p { text-wrap: pretty; }
 
 .hero h1 {
   font-family: var(--font-heading);
-  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-size: var(--display-lg);
   color: var(--navy);
   line-height: 1.15;
   margin-bottom: 20px;
@@ -379,13 +408,14 @@ p { text-wrap: pretty; }
 }
 
 .hero-desc {
-  font-size: 1.08rem;
+  font-size: var(--text-lead);
   color: var(--muted);
   margin-bottom: 32px;
   max-width: 520px;
-  font-weight: 600;
-  line-height: 1.8;
-  letter-spacing: 0.01em;
+  font-weight: 400;
+  /* 1.8 was too airy for a 55ch measure; leading tightens as measure narrows.
+     The positive tracking it carried worked against the same paragraph. */
+  line-height: 1.65;
 }
 
 .hero-buttons {
@@ -405,12 +435,12 @@ p { text-wrap: pretty; }
 .stat-item strong {
   display: block;
   font-family: var(--font-heading);
-  font-size: 1.75rem;
+  font-size: var(--text-2xl);
   color: var(--navy);
 }
 
 .stat-item span {
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--warm-gray);
 }
 
@@ -428,7 +458,7 @@ p { text-wrap: pretty; }
 
 .hero-card-title {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--navy);
   margin-bottom: 20px;
 }
@@ -446,7 +476,7 @@ p { text-wrap: pretty; }
   padding: 12px 16px;
   background: var(--cream);
   border-radius: var(--radius);
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 600;
   color: var(--charcoal);
 }
@@ -487,15 +517,19 @@ p { text-wrap: pretty; }
 
 .card h3 {
   font-family: var(--font-heading);
-  font-size: 1.15rem;
+  font-size: var(--text-subtitle);
   color: var(--black);
   margin-bottom: 8px;
 }
 
 .card p {
-  font-size: 14px;
+  font-size: var(--text-body);
   color: var(--muted);
   line-height: 1.6;
+  /* Cards go single-column below 768px, which stretched this to 86 characters
+     per line. The `ch` unit measures the "0" glyph, which is wider than Inter's
+     average, so 52ch lands at roughly 70 real characters. */
+  max-width: 52ch;
 }
 
 .card-link {
@@ -503,8 +537,8 @@ p { text-wrap: pretty; }
   align-items: center;
   gap: 4px;
   margin-top: 16px;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--black);
   background: none;
   border: none;
@@ -568,7 +602,7 @@ p { text-wrap: pretty; }
 
 .it-banner h2 {
   font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: var(--display-xs);
   margin-bottom: 16px;
   color: white;
 }
@@ -589,7 +623,7 @@ p { text-wrap: pretty; }
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 15px;
+  font-size: var(--text-md);
 }
 
 /* Process Steps */
@@ -614,20 +648,20 @@ p { text-wrap: pretty; }
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--black);
   margin: 0 auto 16px;
 }
 
 .process-step h4 {
-  font-size: 15px;
+  font-size: var(--text-md);
   font-weight: 700;
   color: var(--black);
   margin-bottom: 8px;
 }
 
 .process-step p {
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--warm-gray);
 }
 
@@ -667,7 +701,7 @@ p { text-wrap: pretty; }
 }
 
 .why-item span {
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 600;
   color: var(--charcoal);
 }
@@ -698,8 +732,8 @@ p { text-wrap: pretty; }
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: var(--text-md);
+  font-weight: 600;
   color: var(--black);
   cursor: pointer;
   text-align: left;
@@ -707,7 +741,7 @@ p { text-wrap: pretty; }
 
 .faq-answer {
   padding: 0 24px 20px;
-  font-size: 14px;
+  font-size: var(--text-body);
   color: var(--muted);
   line-height: 1.7;
 }
@@ -746,7 +780,7 @@ p { text-wrap: pretty; }
 }
 
 .contact-card h4 {
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 600;
   color: var(--muted);
   margin-bottom: 8px;
@@ -754,7 +788,7 @@ p { text-wrap: pretty; }
 
 .contact-card .value {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--black);
   word-break: break-all;
 }
@@ -783,11 +817,11 @@ p { text-wrap: pretty; }
 .footer-brand strong {
   color: white;
   font-family: var(--font-heading);
-  font-size: 1.15rem;
+  font-size: var(--text-subtitle);
 }
 
 .footer p {
-  font-size: 14px;
+  font-size: var(--text-body);
   line-height: 1.8;
   max-width: 460px;
   color: rgba(255, 255, 255, 0.7);
@@ -796,7 +830,7 @@ p { text-wrap: pretty; }
 .footer h4 {
   color: white;
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: var(--text-subtitle);
   margin-bottom: 16px;
 }
 
@@ -813,7 +847,7 @@ p { text-wrap: pretty; }
   border: none;
   color: rgba(255, 255, 255, 0.7);
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--text-body);
   cursor: pointer;
   text-align: left;
   transition: color 0.2s;
@@ -829,7 +863,7 @@ p { text-wrap: pretty; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .footer-bottom button {
@@ -837,7 +871,7 @@ p { text-wrap: pretty; }
   border: none;
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--text-meta);
 }
 
 /* Modal */
@@ -887,13 +921,13 @@ p { text-wrap: pretty; }
 
 .modal h2 {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   color: var(--navy);
   margin-bottom: 8px;
 }
 
 .modal-sub {
-  font-size: 14px;
+  font-size: var(--text-body);
   color: var(--warm-gray);
   margin-bottom: 24px;
 }
@@ -905,8 +939,8 @@ p { text-wrap: pretty; }
 
 .form-group label {
   display: block;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--charcoal);
   margin-bottom: 6px;
 }
@@ -917,7 +951,7 @@ p { text-wrap: pretty; }
   border: 1px solid var(--sand);
   border-radius: 8px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--text-body);
   color: var(--charcoal);
   background: var(--warm-white);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -972,8 +1006,8 @@ p { text-wrap: pretty; }
 }
 
 .industry-pill span {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--text-meta);
+  font-weight: 600;
   color: var(--charcoal);
   line-height: 1.3;
 }
@@ -1005,11 +1039,14 @@ p { text-wrap: pretty; }
   border: 1px solid var(--sand);
   background: white;
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--warm-gray);
   cursor: pointer;
-  transition: all 0.2s ease;
+  /* `all` animated font-size and padding too, which pinned the tab's text at
+     its old size whenever the reader's root font-size changed. */
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.2s ease;
   box-shadow: 0 1px 0 rgba(0,0,0,0.04);
 }
 
@@ -1076,7 +1113,7 @@ p { text-wrap: pretty; }
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 15px;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--charcoal);
   padding: 12px 0;
@@ -1157,8 +1194,9 @@ p { text-wrap: pretty; }
     text-overflow: ellipsis;
   }
   .logo-tag {
-    font-size: 8px;
+    font-size: 0.5rem;
     letter-spacing: 0.04em;
+    margin-top: 3px;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -1237,8 +1275,6 @@ p { text-wrap: pretty; }
   .hero-desc {
     font-size: 1rem;
     line-height: 1.7;
-    /* 600 across a full paragraph reads as shouting at phone size. */
-    font-weight: 400;
   }
   .hero-buttons {
     flex-direction: column;
@@ -1279,7 +1315,7 @@ p { text-wrap: pretty; }
     scroll-snap-align: start;
     min-height: var(--tap);
     padding: 10px 18px;
-    font-size: 14px;
+    font-size: var(--text-body);
   }
 
   /* --- Contact ----------------------------------------------------------
@@ -1303,7 +1339,7 @@ p { text-wrap: pretty; }
   }
   .contact-card h4 {
     margin-bottom: 2px;
-    font-size: 12px;
+    font-size: var(--text-meta);
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
