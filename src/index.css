@@ -521,14 +521,17 @@ p { text-wrap: pretty; }
   gap: var(--space-5);
 }
 
+/* Ten pills in a four-column grid left an orphan row of two sitting hard
+   left under a centred heading. Flex wrapping centres every row, including
+   the last one. Used by the industries section only. */
 .grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
   gap: var(--space-5);
   max-width: 980px;
   margin: 0 auto;
-  justify-items: center;
-  align-items: center;
 }
 
 /* IT Highlight Section */
@@ -921,7 +924,7 @@ p { text-wrap: pretty; }
 
 /* Industry pills */
 .industry-pill {
-  width: 100%;
+  flex: 0 1 220px;
   max-width: 220px;
   background: white;
   border: 1px solid var(--sand);
@@ -1092,7 +1095,7 @@ p { text-wrap: pretty; }
   .hero-grid { grid-template-columns: 1fr; }
   .hero-visual { display: none; }
   .grid-3, .why-grid { grid-template-columns: repeat(2, 1fr); }
-  .grid-4, .process-grid { grid-template-columns: repeat(2, 1fr); }
+  .process-grid { grid-template-columns: repeat(2, 1fr); }
   .it-banner { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .nav-actions { margin-left: auto; }
@@ -1193,8 +1196,13 @@ p { text-wrap: pretty; }
   }
 
   /* --- Layout ----------------------------------------------------------- */
-  .grid-3, .grid-4, .why-grid, .process-grid, .contact-grid {
+  .grid-3, .why-grid, .process-grid, .contact-grid {
     grid-template-columns: 1fr;
+  }
+  /* Two per row reads better than one 220px pill adrift in the column. */
+  .industry-pill {
+    flex: 1 1 140px;
+    max-width: none;
   }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
   .section { padding: 56px 0; }
