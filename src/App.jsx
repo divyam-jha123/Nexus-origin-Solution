@@ -309,7 +309,6 @@ export default function App() {
       <section id="about" className="section">
         <div className="container">
           <div style={{ maxWidth: 680 }}>
-            <span className="section-label">Who we are</span>
             <h2 className="section-title">A company built on trust and hard work</h2>
             <p className="section-desc" style={{ marginBottom: 32 }}>
               We are not just another agency offering services online. At Nexus Origin Solution,
@@ -344,7 +343,6 @@ export default function App() {
         <div className="container">
           <div className="it-banner">
             <div>
-              <span className="section-label" style={{ color: '#DD6B20' }}>Digital Services</span>
               <h2>We also build, fix & maintain your website</h2>
               <p>
                 Need a new business website? Something broken on your current site? Or someone to
@@ -373,7 +371,6 @@ export default function App() {
       <section id="services" className="section section-alt">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span className="section-label">Our Services</span>
             <h2 className="section-title">Everything your business needs</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               From factory workers to web developers to AI labeling teams — we cover it all under one roof.
@@ -424,7 +421,6 @@ export default function App() {
       <section id="industries" className="section">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span className="section-label">Industries</span>
             <h2 className="section-title">Sectors we work with</h2>
           </div>
           <div className="grid-4">
@@ -445,7 +441,6 @@ export default function App() {
       <section id="process" className="section section-alt">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span className="section-label">How it works</span>
             <h2 className="section-title">Simple 4-step process</h2>
           </div>
           <div className="process-grid">
@@ -469,7 +464,6 @@ export default function App() {
       <section className="section">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span className="section-label">Why choose us</span>
             <h2 className="section-title">Reasons clients stay with us</h2>
           </div>
           <div className="why-grid">
@@ -496,7 +490,6 @@ export default function App() {
       <section className="section">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span className="section-label">FAQ</span>
             <h2 className="section-title">Common questions</h2>
           </div>
           <div className="faq-list">
@@ -517,7 +510,6 @@ export default function App() {
       <section id="contact" className="section section-alt">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span className="section-label">Contact us</span>
             <h2 className="section-title">Reach out — we are here to help</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Pick up the phone, send a WhatsApp, or write an email. We respond quickly.
