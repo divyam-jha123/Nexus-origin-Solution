@@ -6,7 +6,9 @@
   --black-soft: #171717;
   --charcoal: #171717;
   --slate: #2d2d2d;
-  --muted: #6b7280;
+  /* Body copy stays at 14px by choice, so secondary text needs more
+     contrast than the old #6b7280, which sat at 4.52:1 on the hero. */
+  --muted: #5b6472;
   --line: #e5e7eb;
   --paper: #f8f7f5;
   --white: #ffffff;
@@ -17,6 +19,52 @@
   --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.18);
   --radius: 14px;
   --radius-lg: 22px;
+
+  /* Aliases for the earlier palette still referenced across this sheet.
+     Without these the var() lookups are invalid and the declarations drop. */
+  --warm-white: #fdfcfa;
+  --cream: var(--paper);
+  --sand: var(--line);
+  --border: var(--line);
+  --navy: var(--black);
+  --navy-light: var(--slate);
+  --warm-gray: var(--muted);
+  --text-h: var(--black);
+  --forest: #2f6f4f;
+  --terracotta: var(--gold);
+  --accent: var(--gold);
+  --accent-bg: #fbf4e2;
+  --accent-border: var(--gold-soft);
+  --social-bg: rgba(255, 255, 255, 0.08);
+  --shadow: var(--shadow-md);
+
+  --tap: 44px;
+
+  /* Spacing scale. Grid gaps were previously 16/18/20/24/40 with no
+     relationship between them; these are the four steps actually needed. */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Type roles. Replaces 24 ad-hoc size literals that mixed px, rem and
+     clamp with no relationship between steps. All rem so the sizes honour
+     the reader's browser font-size setting. */
+  --text-micro: 0.6875rem;   /* 11px  logo tag, legal */
+  --text-meta: 0.75rem;      /* 12px  labels, captions */
+  --text-sm: 0.8125rem;      /* 13px  inline links, tabs */
+  --text-body: 0.875rem;     /* 14px  body copy and default UI */
+  --text-md: 0.9375rem;      /* 15px  emphasised UI, list items */
+  --text-lead: 1.0625rem;    /* 17px  hero and section intros */
+  --text-subtitle: 1.15rem;  /* 18px  card titles */
+  --text-lg: 1.25rem;        /* 20px  stat values, step numbers */
+  --text-xl: 1.5rem;         /* 24px  modal titles */
+  --text-2xl: 1.75rem;       /* 28px  hero stat figures */
+  --display-xs: 2rem;        /* 32px  banner heading */
+  --display-sm: clamp(1.75rem, 4vw, 2.75rem);
+  --display-lg: clamp(2.2rem, 5vw, 3.5rem);
 }
 
 * {
@@ -31,6 +79,18 @@ html {
   background-color: var(--paper);
   color: var(--black);
   overflow-x: hidden;
+  /* Stop iOS Safari from inflating type when the phone is turned sideways. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
@@ -38,6 +98,20 @@ body {
   line-height: 1.6;
   background: var(--paper);
   color: var(--black);
+  -webkit-tap-highlight-color: rgba(212, 168, 77, 0.18);
+  overflow-x: hidden;
+}
+
+/* Browser surfaces the design should own rather than inherit. */
+::selection {
+  background: var(--gold-soft);
+  color: var(--black);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar { width: 8px; }
@@ -46,11 +120,35 @@ body {
 
 .font-heading { font-family: var(--font-heading); }
 
+/* Headings inherited the body's 1.6 line-height, which left card titles and
+   section headings visibly untethered from the text beneath them. */
+h1, h2, h3, h4, h5, h6 {
+  /* Three weight tiers carry the hierarchy: 700 headings, 600 UI labels
+     and controls, 400 prose. Previously almost everything sat at 700. */
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+  /* Poppins sets loose at display sizes; nothing here had tracking at all. */
+  letter-spacing: -0.01em;
+}
+
+h1, .display, .section-title {
+  letter-spacing: -0.02em;
+}
+
+h3, h4, h5, h6 {
+  line-height: 1.3;
+}
+
+p { text-wrap: pretty; }
+
 /* Layout */
 .container {
   max-width: 1160px;
   margin: 0 auto;
   padding: 0 24px;
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
 }
 
 .section {
@@ -61,19 +159,9 @@ body {
   background: var(--warm-white);
 }
 
-.section-label {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 12px;
-}
-
 .section-title {
   font-family: var(--font-heading);
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-size: var(--display-sm);
   color: var(--black);
   line-height: 1.2;
   margin-bottom: 16px;
@@ -81,9 +169,9 @@ body {
 
 .section-desc {
   color: var(--muted);
-  font-size: 1.05rem;
+  font-size: var(--text-lead);
   max-width: 600px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* Navbar */
@@ -110,7 +198,9 @@ body {
   justify-content: space-between;
   min-height: 72px;
   gap: 16px;
-  flex-wrap: wrap;
+  /* Wrapping here stacked the bar to 109px on phones and 126px on tablets,
+     pushing the fixed header down over the top of the hero. */
+  flex-wrap: nowrap;
   padding-top: 8px;
   padding-bottom: 8px;
 }
@@ -156,11 +246,12 @@ body {
 }
 
 .logo-tag {
-  font-size: 10px;
+  font-size: var(--text-micro);
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+  margin-top: 4px;
 }
 
 .nav-links {
@@ -173,8 +264,8 @@ body {
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--text-body);
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: color 0.2s;
@@ -192,8 +283,8 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--text-body);
+  font-weight: 600;
   color: var(--white);
   text-decoration: none;
 }
@@ -202,8 +293,8 @@ body {
 .btn-primary {
   background: linear-gradient(135deg, var(--black) 0%, #1a1a1a 100%);
   color: white;
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: var(--text-body);
   padding: 12px 24px;
   border-radius: 10px;
   border: none;
@@ -225,8 +316,8 @@ body {
 .btn-secondary {
   background: var(--black);
   color: white;
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: var(--text-body);
   padding: 12px 24px;
   border-radius: 10px;
   border: none;
@@ -245,7 +336,7 @@ body {
   background: transparent;
   color: var(--black);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--text-body);
   padding: 12px 24px;
   border-radius: 10px;
   border: 2px solid var(--line);
@@ -297,7 +388,7 @@ body {
   border: 1px solid var(--line);
   padding: 8px 16px;
   border-radius: 50px;
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--black);
   margin-bottom: 24px;
@@ -305,7 +396,7 @@ body {
 
 .hero h1 {
   font-family: var(--font-heading);
-  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-size: var(--display-lg);
   color: var(--navy);
   line-height: 1.15;
   margin-bottom: 20px;
@@ -317,13 +408,14 @@ body {
 }
 
 .hero-desc {
-  font-size: 1.08rem;
+  font-size: var(--text-lead);
   color: var(--muted);
   margin-bottom: 32px;
   max-width: 520px;
-  font-weight: 600;
-  line-height: 1.8;
-  letter-spacing: 0.01em;
+  font-weight: 400;
+  /* 1.8 was too airy for a 55ch measure; leading tightens as measure narrows.
+     The positive tracking it carried worked against the same paragraph. */
+  line-height: 1.65;
 }
 
 .hero-buttons {
@@ -343,12 +435,12 @@ body {
 .stat-item strong {
   display: block;
   font-family: var(--font-heading);
-  font-size: 1.75rem;
+  font-size: var(--text-2xl);
   color: var(--navy);
 }
 
 .stat-item span {
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--warm-gray);
 }
 
@@ -366,7 +458,7 @@ body {
 
 .hero-card-title {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--navy);
   margin-bottom: 20px;
 }
@@ -384,7 +476,7 @@ body {
   padding: 12px 16px;
   background: var(--cream);
   border-radius: var(--radius);
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 600;
   color: var(--charcoal);
 }
@@ -425,15 +517,19 @@ body {
 
 .card h3 {
   font-family: var(--font-heading);
-  font-size: 1.15rem;
+  font-size: var(--text-subtitle);
   color: var(--black);
   margin-bottom: 8px;
 }
 
 .card p {
-  font-size: 14px;
+  font-size: var(--text-body);
   color: var(--muted);
   line-height: 1.6;
+  /* Cards go single-column below 768px, which stretched this to 86 characters
+     per line. The `ch` unit measures the "0" glyph, which is wider than Inter's
+     average, so 52ch lands at roughly 70 real characters. */
+  max-width: 52ch;
 }
 
 .card-link {
@@ -441,8 +537,8 @@ body {
   align-items: center;
   gap: 4px;
   margin-top: 16px;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--black);
   background: none;
   border: none;
@@ -456,17 +552,39 @@ body {
 .grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: var(--space-5);
 }
 
+/* Services preview toggle */
+.services-more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}
+
+.services-more .btn-outline {
+  background: var(--white);
+}
+
+.services-more .chev-up {
+  transform: rotate(180deg);
+}
+
+.services-more .btn-outline svg {
+  transition: transform 0.2s ease;
+}
+
+/* Ten pills in a four-column grid left an orphan row of two sitting hard
+   left under a centred heading. Flex wrapping centres every row, including
+   the last one. Used by the industries section only. */
 .grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--space-5);
   max-width: 980px;
   margin: 0 auto;
-  justify-items: center;
-  align-items: center;
 }
 
 /* IT Highlight Section */
@@ -484,7 +602,7 @@ body {
 
 .it-banner h2 {
   font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: var(--display-xs);
   margin-bottom: 16px;
   color: white;
 }
@@ -505,14 +623,14 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 15px;
+  font-size: var(--text-md);
 }
 
 /* Process Steps */
 .process-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: var(--space-5);
 }
 
 .process-step {
@@ -530,20 +648,20 @@ body {
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--black);
   margin: 0 auto 16px;
 }
 
 .process-step h4 {
-  font-size: 15px;
+  font-size: var(--text-md);
   font-weight: 700;
   color: var(--black);
   margin-bottom: 8px;
 }
 
 .process-step p {
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--warm-gray);
 }
 
@@ -552,7 +670,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px;
+  gap: var(--space-4);
   max-width: 980px;
   margin: 0 auto;
 }
@@ -583,7 +701,7 @@ body {
 }
 
 .why-item span {
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 600;
   color: var(--charcoal);
 }
@@ -614,8 +732,8 @@ body {
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: var(--text-md);
+  font-weight: 600;
   color: var(--black);
   cursor: pointer;
   text-align: left;
@@ -623,7 +741,7 @@ body {
 
 .faq-answer {
   padding: 0 24px 20px;
-  font-size: 14px;
+  font-size: var(--text-body);
   color: var(--muted);
   line-height: 1.7;
 }
@@ -632,7 +750,7 @@ body {
 .contact-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: var(--space-5);
 }
 
 .contact-card {
@@ -662,7 +780,7 @@ body {
 }
 
 .contact-card h4 {
-  font-size: 14px;
+  font-size: var(--text-body);
   font-weight: 600;
   color: var(--muted);
   margin-bottom: 8px;
@@ -670,7 +788,7 @@ body {
 
 .contact-card .value {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   color: var(--black);
   word-break: break-all;
 }
@@ -685,8 +803,8 @@ body {
 .footer-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 40px;
+  gap: var(--space-7);
+  margin-bottom: var(--space-7);
 }
 
 .footer-brand {
@@ -699,11 +817,11 @@ body {
 .footer-brand strong {
   color: white;
   font-family: var(--font-heading);
-  font-size: 1.15rem;
+  font-size: var(--text-subtitle);
 }
 
 .footer p {
-  font-size: 14px;
+  font-size: var(--text-body);
   line-height: 1.8;
   max-width: 460px;
   color: rgba(255, 255, 255, 0.7);
@@ -712,7 +830,7 @@ body {
 .footer h4 {
   color: white;
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: var(--text-subtitle);
   margin-bottom: 16px;
 }
 
@@ -729,7 +847,7 @@ body {
   border: none;
   color: rgba(255, 255, 255, 0.7);
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--text-body);
   cursor: pointer;
   text-align: left;
   transition: color 0.2s;
@@ -745,7 +863,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .footer-bottom button {
@@ -753,7 +871,7 @@ body {
   border: none;
   color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
-  font-size: 12px;
+  font-size: var(--text-meta);
 }
 
 /* Modal */
@@ -803,13 +921,13 @@ body {
 
 .modal h2 {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   color: var(--navy);
   margin-bottom: 8px;
 }
 
 .modal-sub {
-  font-size: 14px;
+  font-size: var(--text-body);
   color: var(--warm-gray);
   margin-bottom: 24px;
 }
@@ -821,8 +939,8 @@ body {
 
 .form-group label {
   display: block;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--charcoal);
   margin-bottom: 6px;
 }
@@ -833,7 +951,7 @@ body {
   border: 1px solid var(--sand);
   border-radius: 8px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--text-body);
   color: var(--charcoal);
   background: var(--warm-white);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -859,7 +977,7 @@ body {
 
 /* Industry pills */
 .industry-pill {
-  width: 100%;
+  flex: 0 1 220px;
   max-width: 220px;
   background: white;
   border: 1px solid var(--sand);
@@ -888,8 +1006,8 @@ body {
 }
 
 .industry-pill span {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--text-meta);
+  font-weight: 600;
   color: var(--charcoal);
   line-height: 1.3;
 }
@@ -921,11 +1039,14 @@ body {
   border: 1px solid var(--sand);
   background: white;
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: var(--text-sm);
+  font-weight: 600;
   color: var(--warm-gray);
   cursor: pointer;
-  transition: all 0.2s ease;
+  /* `all` animated font-size and padding too, which pinned the tab's text at
+     its old size whenever the reader's root font-size changed. */
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.2s ease;
   box-shadow: 0 1px 0 rgba(0,0,0,0.04);
 }
 
@@ -985,11 +1106,14 @@ body {
 
 .mobile-menu.open { display: flex; }
 
+/* Only shown below 768px, where the quote button leaves the top bar. */
+.mobile-menu-cta { display: none; }
+
 .mobile-menu button {
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 15px;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--charcoal);
   padding: 12px 0;
@@ -998,81 +1122,158 @@ body {
   border-bottom: 1px solid var(--sand);
 }
 
-/* Responsive */
+/* ==========================================================================
+   Responsive
+   Breakpoints are content-driven: 1024px is where the multi-column grids
+   stop fitting, 768px is where the horizontal nav gives way to the drawer,
+   and 380px is where the tightest rows begin to crowd.
+   ========================================================================== */
+
+/* The horizontal link list stops fitting alongside the brand lockup well
+   before 768px, so the drawer takes over at the tablet breakpoint. */
 @media (max-width: 1024px) {
+  .nav-links, .nav-phone { display: none; }
+  .nav-inner { min-height: 64px; }
+  .mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    border-radius: 12px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .mobile-toggle:active { background: rgba(255, 255, 255, 0.16); }
+  .mobile-menu { top: calc(64px + env(safe-area-inset-top)); }
+  .hero { padding-top: calc(88px + env(safe-area-inset-top)); }
+
   .hero-grid { grid-template-columns: 1fr; }
   .hero-visual { display: none; }
   .grid-3, .why-grid { grid-template-columns: repeat(2, 1fr); }
-  .grid-4, .process-grid { grid-template-columns: repeat(2, 1fr); }
+  .process-grid { grid-template-columns: repeat(2, 1fr); }
   .it-banner { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .nav-actions { margin-left: auto; }
 }
 
 @media (max-width: 768px) {
+  /* --- Navigation -------------------------------------------------------
+     The bar used to wrap onto a second row: .logo grew to the full width
+     and pushed .nav-actions down, making the header 109px tall and hiding
+     the top of the hero underneath it. Keep it to a single row. */
   .navbar {
     background: rgba(17, 17, 17, 0.95);
+    padding-top: env(safe-area-inset-top);
   }
   .nav-inner {
+    flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    min-height: 68px;
+    min-height: 64px;
+    gap: 12px;
     padding-top: 6px;
     padding-bottom: 6px;
   }
   .logo {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
     gap: 10px;
   }
   .brand-logo {
-    width: 82px;
-    max-height: 38px;
+    width: 64px;
+    max-height: 34px;
   }
+  .logo-text { min-width: 0; }
   .logo-name {
-    white-space: normal;
-    line-height: 1.15;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     letter-spacing: 0.02em;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .logo-tag {
-    white-space: normal;
+    font-size: 0.5rem;
     letter-spacing: 0.04em;
+    margin-top: 3px;
     line-height: 1.2;
-    font-size: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+
   .nav-links, .nav-phone { display: none; }
+  .nav-actions { flex: 0 0 auto; gap: 8px; }
+  /* The drawer already carries a quote action; two competing CTAs in a
+     64px bar is what forced the wrap in the first place. */
+  .nav-actions .btn-primary { display: none; }
+
   .mobile-toggle {
-    display: block;
-    color: #fff;
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    width: var(--tap);
+    height: var(--tap);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
   }
+  .mobile-toggle:active { background: rgba(255, 255, 255, 0.16); }
+
   .mobile-menu {
-    background: rgba(17, 17, 17, 0.98);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    top: calc(64px + env(safe-area-inset-top));
+    max-height: calc(100dvh - 64px - env(safe-area-inset-top));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Was 0.98 alpha, which let the hero headline read through the panel. */
+    background: #111111;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
   .mobile-menu button,
   .mobile-menu .nav-phone {
     color: #fff;
+    min-height: var(--tap);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-  .grid-3, .grid-4, .why-grid, .process-grid, .contact-grid {
+  .mobile-menu .nav-phone { display: flex; }
+
+  /* The bar is too narrow for the brand lockup and two actions, so the
+     quote CTA lives at the foot of the drawer instead. */
+  .mobile-menu-cta {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: var(--space-3);
+    border-bottom: none;
+  }
+
+  /* --- Layout ----------------------------------------------------------- */
+  .grid-3, .why-grid, .process-grid, .contact-grid {
     grid-template-columns: 1fr;
   }
+  /* Two per row reads better than one 220px pill adrift in the column. */
+  .industry-pill {
+    flex: 1 1 140px;
+    max-width: none;
+  }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .section { padding: 56px 0; }
+
+  /* Clears the 64px fixed bar plus breathing room, so the eyebrow pill at
+     the top of the hero is no longer tucked behind it. */
   .hero {
-    padding-top: 100px;
+    padding-top: calc(88px + env(safe-area-inset-top));
   }
   .hero h1 {
     font-size: clamp(2rem, 9vw, 2.7rem);
   }
   .hero-desc {
-    font-size: 0.98rem;
+    font-size: 1rem;
     line-height: 1.7;
   }
   .hero-buttons {
@@ -1088,7 +1289,161 @@ body {
     gap: 20px;
     justify-content: space-between;
   }
-  .footer-grid { grid-template-columns: 1fr; }
-  .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
-  .section { padding: 56px 0; }
+
+  /* --- Service filter --------------------------------------------------
+     Five pills wrapped into a ragged two-row block. A single swipeable
+     row keeps the filter one gesture wide and the cards above the fold. */
+  .service-tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    /* Without this the snap lands on the scrollport edge and the first pill
+       loses the 24px gutter every other block on the page aligns to. */
+    scroll-padding-inline-start: 24px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Bleed to the screen edge so the strip reads as scrollable. */
+    margin-inline: -24px;
+    padding-inline: 24px;
+    padding-bottom: 4px;
+  }
+  .service-tabs::-webkit-scrollbar { display: none; }
+  .service-tab {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-height: var(--tap);
+    padding: 10px 18px;
+    font-size: var(--text-body);
+  }
+
+  /* --- Contact ----------------------------------------------------------
+     Three 200px centred cards pushed the actual phone number and email
+     three screens apart. Compact them into scannable rows. */
+  .contact-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 16px;
+    align-items: center;
+    text-align: left;
+    padding: 16px 18px;
+    border-radius: var(--radius);
+  }
+  .contact-card-icon {
+    grid-row: 1 / span 2;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+  }
+  .contact-card h4 {
+    margin-bottom: 2px;
+    font-size: var(--text-meta);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .contact-card .value {
+    /* Sized so the longest value (the email) sets on one line at 360px+
+       rather than breaking after "gmail." */
+    font-size: clamp(0.9rem, 3.7vw, 1.05rem);
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* --- Footer ----------------------------------------------------------- */
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+  .footer-bottom { flex-direction: column; gap: var(--space-3); text-align: center; }
+  .footer { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+
+  /* --- Spacing rhythm ---------------------------------------------------
+     48px of box padding and a 40px gap are desktop values; at 382px wide
+     they leave the banner copy in a narrow column. */
+  .it-banner {
+    padding: 28px 22px;
+    gap: var(--space-5);
+  }
+  .card { padding: 22px; }
+  .section-title { font-size: clamp(1.55rem, 6.5vw, 1.9rem); }
+
+  /* One consistent step between a section's heading block and its content. */
+  .section-header,
+  .section-head { margin-bottom: var(--space-6); }
+}
+
+/* Narrowest phones: the brand lockup is the first thing to crowd. */
+@media (max-width: 380px) {
+  .brand-logo { width: 54px; max-height: 30px; }
+  .logo-name { font-size: 0.82rem; }
+  .logo-tag { display: none; }
+  .hero-stats { gap: 14px; }
+}
+
+/* --------------------------------------------------------------------------
+   Touch input. Keyed to the pointer first so a touchscreen laptop gets the
+   same target sizes a phone does, and to the viewport as well because some
+   Android browsers still report a fine pointer.
+   -------------------------------------------------------------------------- */
+@media (pointer: coarse), (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline,
+  .service-tab,
+  .mobile-toggle {
+    min-height: var(--tap);
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline {
+    padding-block: 12px;
+  }
+
+  /* Inline text actions carry no box of their own, so grow the hit area
+     without moving the text: 15px tall was well under the 44px floor. */
+  .card-link,
+  .footer-links a,
+  .footer-links button,
+  .footer-bottom button {
+    position: relative;
+  }
+  .card-link::after,
+  .footer-links a::after,
+  .footer-links button::after,
+  .footer-bottom button::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: max(100%, var(--tap));
+  }
+
+  /* Give stacked link lists room so neighbouring targets don't collide. */
+  .footer-links li + li { margin-top: 4px; }
+}
+
+/* Hover belongs to devices that can hover. On touch these states latch
+   after a tap and read as a stuck element. */
+@media (hover: none) {
+  .btn-primary:hover,
+  .service-tab:hover,
+  .card:hover,
+  .contact-card:hover {
+    transform: none;
+  }
+}
+
+/* Never let a form control trigger iOS's zoom-on-focus. */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }

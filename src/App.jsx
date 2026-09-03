@@ -11,7 +11,7 @@ import {
   Bug, Monitor, Tag, Code, Layers, Headphones, Handshake
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
 const COMPANY_PHONE = '8102899935';
 const COMPANY_EMAIL = 'nexusoriginsolution@gmail.com';
 
@@ -77,6 +77,7 @@ export default function App() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [showAllServices, setShowAllServices] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -195,6 +196,24 @@ export default function App() {
     ? allServicesList
     : allServicesList.filter(s => s.cat === activeCategory);
 
+  // Two full rows on desktop. The full set runs to 21 cards, which made this
+  // the longest block on the page by a wide margin.
+  const SERVICES_PREVIEW_COUNT = 6;
+  const servicesOverflow = filteredServices.length - SERVICES_PREVIEW_COUNT;
+  const visibleServices = showAllServices
+    ? filteredServices
+    : filteredServices.slice(0, SERVICES_PREVIEW_COUNT);
+
+  const selectCategory = (id) => {
+    setActiveCategory(id);
+    setShowAllServices(false);
+  };
+
+  const collapseServices = () => {
+    setShowAllServices(false);
+    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const filteredAdmin = adminRequests.filter(r =>
     r.companyName?.toLowerCase().includes(adminSearch.toLowerCase()) ||
     r.contactPerson?.toLowerCase().includes(adminSearch.toLowerCase()) ||
@@ -242,6 +261,12 @@ export default function App() {
           <a href={`tel:${COMPANY_PHONE}`} className="nav-phone" style={{ padding: '12px 0' }}>
             <PhoneCall size={16} /> Call {COMPANY_PHONE}
           </a>
+          <button
+            className="btn-primary mobile-menu-cta"
+            onClick={() => { setMobileMenuOpen(false); setShowRequestModal(true); }}
+          >
+            Get a Quote <ArrowRight size={16} />
+          </button>
         </div>
       </header>
 
@@ -303,7 +328,6 @@ export default function App() {
       <section id="about" className="section">
         <div className="container">
           <div style={{ maxWidth: 680 }}>
-            <span className="section-label">Who we are</span>
             <h2 className="section-title">A company built on trust and hard work</h2>
             <p className="section-desc" style={{ marginBottom: 32 }}>
               We are not just another agency offering services online. At Nexus Origin Solution,
@@ -338,7 +362,6 @@ export default function App() {
         <div className="container">
           <div className="it-banner">
             <div>
-              <span className="section-label" style={{ color: '#DD6B20' }}>Digital Services</span>
               <h2>We also build, fix & maintain your website</h2>
               <p>
                 Need a new business website? Something broken on your current site? Or someone to
@@ -367,7 +390,6 @@ export default function App() {
       <section id="services" className="section section-alt">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span className="section-label">Our Services</span>
             <h2 className="section-title">Everything your business needs</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               From factory workers to web developers to AI labeling teams — we cover it all under one roof.
@@ -380,7 +402,7 @@ export default function App() {
                 key={cat.id}
                 className={`service-tab ${activeCategory === cat.id ? 'active' : ''}`}
                 data-category={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
+                onClick={() => selectCategory(cat.id)}
               >
                 {cat.label}
               </button>
@@ -388,7 +410,7 @@ export default function App() {
           </div>
 
           <div className="grid-3">
-            {filteredServices.map((service, idx) => {
+            {visibleServices.map((service, idx) => {
               const Icon = service.icon;
               const colors = {
                 manpower: { bg: '#E6F4ED', color: '#276749' },
@@ -411,6 +433,22 @@ export default function App() {
               );
             })}
           </div>
+
+          {servicesOverflow > 0 && (
+            <div className="services-more">
+              <button
+                className="btn-outline"
+                aria-expanded={showAllServices}
+                aria-controls="services"
+                onClick={() => (showAllServices ? collapseServices() : setShowAllServices(true))}
+              >
+                {showAllServices
+                  ? 'Show fewer services'
+                  : `View all ${filteredServices.length} services`}
+                <ChevronDown size={16} className={showAllServices ? 'chev-up' : undefined} />
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -418,7 +456,6 @@ export default function App() {
       <section id="industries" className="section">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span className="section-label">Industries</span>
             <h2 className="section-title">Sectors we work with</h2>
           </div>
           <div className="grid-4">
@@ -439,7 +476,6 @@ export default function App() {
       <section id="process" className="section section-alt">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span className="section-label">How it works</span>
             <h2 className="section-title">Simple 4-step process</h2>
           </div>
           <div className="process-grid">
@@ -463,7 +499,6 @@ export default function App() {
       <section className="section">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span className="section-label">Why choose us</span>
             <h2 className="section-title">Reasons clients stay with us</h2>
           </div>
           <div className="why-grid">
@@ -490,7 +525,6 @@ export default function App() {
       <section className="section">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-            <span className="section-label">FAQ</span>
             <h2 className="section-title">Common questions</h2>
           </div>
           <div className="faq-list">
@@ -511,7 +545,6 @@ export default function App() {
       <section id="contact" className="section section-alt">
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span className="section-label">Contact us</span>
             <h2 className="section-title">Reach out — we are here to help</h2>
             <p className="section-desc" style={{ margin: '0 auto' }}>
               Pick up the phone, send a WhatsApp, or write an email. We respond quickly.
@@ -549,7 +582,7 @@ export default function App() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 40 }}>
-            <button className="btn-primary" style={{ fontSize: 16, padding: '14px 32px' }} onClick={() => setShowRequestModal(true)}>
+            <button className="btn-primary" style={{ fontSize: '1rem', padding: '14px 32px' }} onClick={() => setShowRequestModal(true)}>
               Submit a Requirement Form <Send size={18} />
             </button>
           </div>
@@ -583,7 +616,7 @@ export default function App() {
               <ul className="footer-links">
                 <li><a href={`tel:${COMPANY_PHONE}`}>{COMPANY_PHONE}</a></li>
                 <li><a href={`mailto:${COMPANY_EMAIL}`}>{COMPANY_EMAIL}</a></li>
-                <li><a href="https://wa.me/91${COMPANY_PHONE}" target="_blank" rel="noreferrer">WhatsApp</a></li>
+                <li><a href={`https://wa.me/91${COMPANY_PHONE}`} target="_blank" rel="noreferrer">WhatsApp</a></li>
               </ul>
             </div>
           </div>
@@ -796,10 +829,10 @@ export default function App() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
                   <h2>Requirements ({filteredAdmin.length})</h2>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="btn-outline" onClick={exportToExcel} style={{ fontSize: 12, padding: '8px 16px' }}>
+                    <button className="btn-outline" onClick={exportToExcel} style={{ fontSize: 'var(--text-meta)', padding: '8px 16px' }}>
                       <Download size={14} /> Excel
                     </button>
-                    <button className="btn-outline" onClick={exportToPDF} style={{ fontSize: 12, padding: '8px 16px' }}>
+                    <button className="btn-outline" onClick={exportToPDF} style={{ fontSize: 'var(--text-meta)', padding: '8px 16px' }}>
                       <Download size={14} /> PDF
                     </button>
                   </div>
@@ -807,7 +840,7 @@ export default function App() {
                 <input className="form-input" placeholder="Search..." value={adminSearch}
                   onChange={e => setAdminSearch(e.target.value)} style={{ marginBottom: 16 }} />
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', fontSize: 13, borderCollapse: 'collapse' }}>
+                  <table style={{ width: '100%', fontSize: 'var(--text-sm)', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid var(--sand)', textAlign: 'left' }}>
                         <th style={{ padding: 8 }}>Company</th>
@@ -822,7 +855,7 @@ export default function App() {
                       {filteredAdmin.map(req => (
                         <tr key={req.id} style={{ borderBottom: '1px solid var(--sand)' }}>
                           <td style={{ padding: 8, fontWeight: 600 }}>{req.companyName}</td>
-                          <td style={{ padding: 8 }}>{req.contactPerson}<br /><span style={{ color: '#C05621', fontSize: 11 }}>{req.phone}</span></td>
+                          <td style={{ padding: 8 }}>{req.contactPerson}<br /><span style={{ color: '#C05621', fontSize: 'var(--text-micro)' }}>{req.phone}</span></td>
                           <td style={{ padding: 8 }}>{req.jobPosition}</td>
                           <td style={{ padding: 8 }}>{req.employeesRequired}</td>
                           <td style={{ padding: 8 }}>{req.city}</td>
