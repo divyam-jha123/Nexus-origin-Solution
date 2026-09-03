@@ -17,6 +17,35 @@
   --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.18);
   --radius: 14px;
   --radius-lg: 22px;
+
+  /* Aliases for the earlier palette still referenced across this sheet.
+     Without these the var() lookups are invalid and the declarations drop. */
+  --warm-white: #fdfcfa;
+  --cream: var(--paper);
+  --sand: var(--line);
+  --border: var(--line);
+  --navy: var(--black);
+  --navy-light: var(--slate);
+  --warm-gray: var(--muted);
+  --text-h: var(--black);
+  --forest: #2f6f4f;
+  --terracotta: var(--gold);
+  --accent: var(--gold);
+  --accent-bg: #fbf4e2;
+  --accent-border: var(--gold-soft);
+  --social-bg: rgba(255, 255, 255, 0.08);
+  --shadow: var(--shadow-md);
+
+  --tap: 44px;
+
+  /* Spacing scale. Grid gaps were previously 16/18/20/24/40 with no
+     relationship between them; these are the four steps actually needed. */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
 }
 
 * {
@@ -31,6 +60,18 @@ html {
   background-color: var(--paper);
   color: var(--black);
   overflow-x: hidden;
+  /* Stop iOS Safari from inflating type when the phone is turned sideways. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
@@ -38,6 +79,20 @@ body {
   line-height: 1.6;
   background: var(--paper);
   color: var(--black);
+  -webkit-tap-highlight-color: rgba(212, 168, 77, 0.18);
+  overflow-x: hidden;
+}
+
+/* Browser surfaces the design should own rather than inherit. */
+::selection {
+  background: var(--gold-soft);
+  color: var(--black);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar { width: 8px; }
@@ -46,11 +101,26 @@ body {
 
 .font-heading { font-family: var(--font-heading); }
 
+/* Headings inherited the body's 1.6 line-height, which left card titles and
+   section headings visibly untethered from the text beneath them. */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+h3, h4, h5, h6 {
+  line-height: 1.3;
+}
+
+p { text-wrap: pretty; }
+
 /* Layout */
 .container {
   max-width: 1160px;
   margin: 0 auto;
   padding: 0 24px;
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
 }
 
 .section {
@@ -110,7 +180,9 @@ body {
   justify-content: space-between;
   min-height: 72px;
   gap: 16px;
-  flex-wrap: wrap;
+  /* Wrapping here stacked the bar to 109px on phones and 126px on tablets,
+     pushing the fixed header down over the top of the hero. */
+  flex-wrap: nowrap;
   padding-top: 8px;
   padding-bottom: 8px;
 }
@@ -456,13 +528,13 @@ body {
 .grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: var(--space-5);
 }
 
 .grid-4 {
   display: grid;
   grid-template-columns: repeat(4, minmax(160px, 1fr));
-  gap: 20px;
+  gap: var(--space-5);
   max-width: 980px;
   margin: 0 auto;
   justify-items: center;
@@ -512,7 +584,7 @@ body {
 .process-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: var(--space-5);
 }
 
 .process-step {
@@ -552,7 +624,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px;
+  gap: var(--space-4);
   max-width: 980px;
   margin: 0 auto;
 }
@@ -632,7 +704,7 @@ body {
 .contact-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: var(--space-5);
 }
 
 .contact-card {
@@ -685,8 +757,8 @@ body {
 .footer-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 40px;
+  gap: var(--space-7);
+  margin-bottom: var(--space-7);
 }
 
 .footer-brand {
@@ -985,6 +1057,9 @@ body {
 
 .mobile-menu.open { display: flex; }
 
+/* Only shown below 768px, where the quote button leaves the top bar. */
+.mobile-menu-cta { display: none; }
+
 .mobile-menu button {
   background: none;
   border: none;
@@ -998,8 +1073,32 @@ body {
   border-bottom: 1px solid var(--sand);
 }
 
-/* Responsive */
+/* ==========================================================================
+   Responsive
+   Breakpoints are content-driven: 1024px is where the multi-column grids
+   stop fitting, 768px is where the horizontal nav gives way to the drawer,
+   and 380px is where the tightest rows begin to crowd.
+   ========================================================================== */
+
+/* The horizontal link list stops fitting alongside the brand lockup well
+   before 768px, so the drawer takes over at the tablet breakpoint. */
 @media (max-width: 1024px) {
+  .nav-links, .nav-phone { display: none; }
+  .nav-inner { min-height: 64px; }
+  .mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    border-radius: 12px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .mobile-toggle:active { background: rgba(255, 255, 255, 0.16); }
+  .mobile-menu { top: calc(64px + env(safe-area-inset-top)); }
+  .hero { padding-top: calc(88px + env(safe-area-inset-top)); }
+
   .hero-grid { grid-template-columns: 1fr; }
   .hero-visual { display: none; }
   .grid-3, .why-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1010,70 +1109,119 @@ body {
 }
 
 @media (max-width: 768px) {
+  /* --- Navigation -------------------------------------------------------
+     The bar used to wrap onto a second row: .logo grew to the full width
+     and pushed .nav-actions down, making the header 109px tall and hiding
+     the top of the hero underneath it. Keep it to a single row. */
   .navbar {
     background: rgba(17, 17, 17, 0.95);
+    padding-top: env(safe-area-inset-top);
   }
   .nav-inner {
+    flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    min-height: 68px;
+    min-height: 64px;
+    gap: 12px;
     padding-top: 6px;
     padding-bottom: 6px;
   }
   .logo {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
     gap: 10px;
   }
   .brand-logo {
-    width: 82px;
-    max-height: 38px;
+    width: 64px;
+    max-height: 34px;
   }
+  .logo-text { min-width: 0; }
   .logo-name {
-    white-space: normal;
-    line-height: 1.15;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     letter-spacing: 0.02em;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .logo-tag {
-    white-space: normal;
+    font-size: 8px;
     letter-spacing: 0.04em;
     line-height: 1.2;
-    font-size: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+
   .nav-links, .nav-phone { display: none; }
+  .nav-actions { flex: 0 0 auto; gap: 8px; }
+  /* The drawer already carries a quote action; two competing CTAs in a
+     64px bar is what forced the wrap in the first place. */
+  .nav-actions .btn-primary { display: none; }
+
   .mobile-toggle {
-    display: block;
-    color: #fff;
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    width: var(--tap);
+    height: var(--tap);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
   }
+  .mobile-toggle:active { background: rgba(255, 255, 255, 0.16); }
+
   .mobile-menu {
-    background: rgba(17, 17, 17, 0.98);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    top: calc(64px + env(safe-area-inset-top));
+    max-height: calc(100dvh - 64px - env(safe-area-inset-top));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Was 0.98 alpha, which let the hero headline read through the panel. */
+    background: #111111;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
   .mobile-menu button,
   .mobile-menu .nav-phone {
     color: #fff;
+    min-height: var(--tap);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
+  .mobile-menu .nav-phone { display: flex; }
+
+  /* The bar is too narrow for the brand lockup and two actions, so the
+     quote CTA lives at the foot of the drawer instead. */
+  .mobile-menu-cta {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: var(--space-3);
+    border-bottom: none;
+  }
+
+  /* --- Layout ----------------------------------------------------------- */
   .grid-3, .grid-4, .why-grid, .process-grid, .contact-grid {
     grid-template-columns: 1fr;
   }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .section { padding: 56px 0; }
+
+  /* Clears the 64px fixed bar plus breathing room, so the eyebrow pill at
+     the top of the hero is no longer tucked behind it. */
   .hero {
-    padding-top: 100px;
+    padding-top: calc(88px + env(safe-area-inset-top));
   }
   .hero h1 {
     font-size: clamp(2rem, 9vw, 2.7rem);
   }
   .hero-desc {
-    font-size: 0.98rem;
+    font-size: 1rem;
     line-height: 1.7;
+    /* 600 across a full paragraph reads as shouting at phone size. */
+    font-weight: 400;
   }
   .hero-buttons {
     flex-direction: column;
@@ -1088,7 +1236,161 @@ body {
     gap: 20px;
     justify-content: space-between;
   }
-  .footer-grid { grid-template-columns: 1fr; }
-  .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
-  .section { padding: 56px 0; }
+
+  /* --- Service filter --------------------------------------------------
+     Five pills wrapped into a ragged two-row block. A single swipeable
+     row keeps the filter one gesture wide and the cards above the fold. */
+  .service-tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    /* Without this the snap lands on the scrollport edge and the first pill
+       loses the 24px gutter every other block on the page aligns to. */
+    scroll-padding-inline-start: 24px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Bleed to the screen edge so the strip reads as scrollable. */
+    margin-inline: -24px;
+    padding-inline: 24px;
+    padding-bottom: 4px;
+  }
+  .service-tabs::-webkit-scrollbar { display: none; }
+  .service-tab {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-height: var(--tap);
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+
+  /* --- Contact ----------------------------------------------------------
+     Three 200px centred cards pushed the actual phone number and email
+     three screens apart. Compact them into scannable rows. */
+  .contact-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 16px;
+    align-items: center;
+    text-align: left;
+    padding: 16px 18px;
+    border-radius: var(--radius);
+  }
+  .contact-card-icon {
+    grid-row: 1 / span 2;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+  }
+  .contact-card h4 {
+    margin-bottom: 2px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .contact-card .value {
+    /* Sized so the longest value (the email) sets on one line at 360px+
+       rather than breaking after "gmail." */
+    font-size: clamp(0.9rem, 3.7vw, 1.05rem);
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* --- Footer ----------------------------------------------------------- */
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+  .footer-bottom { flex-direction: column; gap: var(--space-3); text-align: center; }
+  .footer { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+
+  /* --- Spacing rhythm ---------------------------------------------------
+     48px of box padding and a 40px gap are desktop values; at 382px wide
+     they leave the banner copy in a narrow column. */
+  .it-banner {
+    padding: 28px 22px;
+    gap: var(--space-5);
+  }
+  .card { padding: 22px; }
+  .section-title { font-size: clamp(1.55rem, 6.5vw, 1.9rem); }
+
+  /* One consistent step between a section's heading block and its content. */
+  .section-header,
+  .section-head { margin-bottom: var(--space-6); }
+}
+
+/* Narrowest phones: the brand lockup is the first thing to crowd. */
+@media (max-width: 380px) {
+  .brand-logo { width: 54px; max-height: 30px; }
+  .logo-name { font-size: 0.82rem; }
+  .logo-tag { display: none; }
+  .hero-stats { gap: 14px; }
+}
+
+/* --------------------------------------------------------------------------
+   Touch input. Keyed to the pointer first so a touchscreen laptop gets the
+   same target sizes a phone does, and to the viewport as well because some
+   Android browsers still report a fine pointer.
+   -------------------------------------------------------------------------- */
+@media (pointer: coarse), (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline,
+  .service-tab,
+  .mobile-toggle {
+    min-height: var(--tap);
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline {
+    padding-block: 12px;
+  }
+
+  /* Inline text actions carry no box of their own, so grow the hit area
+     without moving the text: 15px tall was well under the 44px floor. */
+  .card-link,
+  .footer-links a,
+  .footer-links button,
+  .footer-bottom button {
+    position: relative;
+  }
+  .card-link::after,
+  .footer-links a::after,
+  .footer-links button::after,
+  .footer-bottom button::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: max(100%, var(--tap));
+  }
+
+  /* Give stacked link lists room so neighbouring targets don't collide. */
+  .footer-links li + li { margin-top: 4px; }
+}
+
+/* Hover belongs to devices that can hover. On touch these states latch
+   after a tap and read as a stuck element. */
+@media (hover: none) {
+  .btn-primary:hover,
+  .service-tab:hover,
+  .card:hover,
+  .contact-card:hover {
+    transform: none;
+  }
+}
+
+/* Never let a form control trigger iOS's zoom-on-focus. */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }

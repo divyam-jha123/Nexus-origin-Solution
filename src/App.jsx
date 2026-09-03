@@ -11,7 +11,7 @@ import {
   Bug, Monitor, Tag, Code, Layers, Headphones, Handshake
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
 const COMPANY_PHONE = '8102899935';
 const COMPANY_EMAIL = 'nexusoriginsolution@gmail.com';
 
@@ -242,6 +242,12 @@ export default function App() {
           <a href={`tel:${COMPANY_PHONE}`} className="nav-phone" style={{ padding: '12px 0' }}>
             <PhoneCall size={16} /> Call {COMPANY_PHONE}
           </a>
+          <button
+            className="btn-primary mobile-menu-cta"
+            onClick={() => { setMobileMenuOpen(false); setShowRequestModal(true); }}
+          >
+            Get a Quote <ArrowRight size={16} />
+          </button>
         </div>
       </header>
 
@@ -583,7 +589,7 @@ export default function App() {
               <ul className="footer-links">
                 <li><a href={`tel:${COMPANY_PHONE}`}>{COMPANY_PHONE}</a></li>
                 <li><a href={`mailto:${COMPANY_EMAIL}`}>{COMPANY_EMAIL}</a></li>
-                <li><a href="https://wa.me/91${COMPANY_PHONE}" target="_blank" rel="noreferrer">WhatsApp</a></li>
+                <li><a href={`https://wa.me/91${COMPANY_PHONE}`} target="_blank" rel="noreferrer">WhatsApp</a></li>
               </ul>
             </div>
           </div>
