@@ -861,17 +861,9 @@ p { text-wrap: pretty; }
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 24px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   font-size: var(--text-sm);
-}
-
-.footer-bottom button {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  font-size: var(--text-meta);
 }
 
 /* Modal */
@@ -1284,10 +1276,17 @@ p { text-wrap: pretty; }
     width: 100%;
     justify-content: center;
   }
+  /* Two across, then the third centred under them rather than left-dangling,
+     with every figure centred inside its own cell. */
   .hero-stats {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
-    justify-content: space-between;
+    justify-items: center;
+    text-align: center;
+  }
+  .hero-stats .stat-item:last-child {
+    grid-column: 1 / -1;
   }
 
   /* --- Service filter --------------------------------------------------
@@ -1407,14 +1406,12 @@ p { text-wrap: pretty; }
      without moving the text: 15px tall was well under the 44px floor. */
   .card-link,
   .footer-links a,
-  .footer-links button,
-  .footer-bottom button {
+  .footer-links button {
     position: relative;
   }
   .card-link::after,
   .footer-links a::after,
-  .footer-links button::after,
-  .footer-bottom button::after {
+  .footer-links button::after {
     content: '';
     position: absolute;
     left: -8px;
