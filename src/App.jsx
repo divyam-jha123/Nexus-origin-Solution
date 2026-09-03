@@ -77,6 +77,7 @@ export default function App() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [showAllServices, setShowAllServices] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -194,6 +195,24 @@ export default function App() {
   const filteredServices = activeCategory === 'all'
     ? allServicesList
     : allServicesList.filter(s => s.cat === activeCategory);
+
+  // Two full rows on desktop. The full set runs to 21 cards, which made this
+  // the longest block on the page by a wide margin.
+  const SERVICES_PREVIEW_COUNT = 6;
+  const servicesOverflow = filteredServices.length - SERVICES_PREVIEW_COUNT;
+  const visibleServices = showAllServices
+    ? filteredServices
+    : filteredServices.slice(0, SERVICES_PREVIEW_COUNT);
+
+  const selectCategory = (id) => {
+    setActiveCategory(id);
+    setShowAllServices(false);
+  };
+
+  const collapseServices = () => {
+    setShowAllServices(false);
+    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const filteredAdmin = adminRequests.filter(r =>
     r.companyName?.toLowerCase().includes(adminSearch.toLowerCase()) ||
@@ -383,7 +402,7 @@ export default function App() {
                 key={cat.id}
                 className={`service-tab ${activeCategory === cat.id ? 'active' : ''}`}
                 data-category={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
+                onClick={() => selectCategory(cat.id)}
               >
                 {cat.label}
               </button>
@@ -391,7 +410,7 @@ export default function App() {
           </div>
 
           <div className="grid-3">
-            {filteredServices.map((service, idx) => {
+            {visibleServices.map((service, idx) => {
               const Icon = service.icon;
               const colors = {
                 manpower: { bg: '#E6F4ED', color: '#276749' },
@@ -414,6 +433,22 @@ export default function App() {
               );
             })}
           </div>
+
+          {servicesOverflow > 0 && (
+            <div className="services-more">
+              <button
+                className="btn-outline"
+                aria-expanded={showAllServices}
+                aria-controls="services"
+                onClick={() => (showAllServices ? collapseServices() : setShowAllServices(true))}
+              >
+                {showAllServices
+                  ? 'Show fewer services'
+                  : `View all ${filteredServices.length} services`}
+                <ChevronDown size={16} className={showAllServices ? 'chev-up' : undefined} />
+              </button>
+            </div>
+          )}
         </div>
       </section>
 

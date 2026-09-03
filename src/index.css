@@ -521,6 +521,25 @@ p { text-wrap: pretty; }
   gap: var(--space-5);
 }
 
+/* Services preview toggle */
+.services-more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}
+
+.services-more .btn-outline {
+  background: var(--white);
+}
+
+.services-more .chev-up {
+  transform: rotate(180deg);
+}
+
+.services-more .btn-outline svg {
+  transition: transform 0.2s ease;
+}
+
 /* Ten pills in a four-column grid left an orphan row of two sitting hard
    left under a centred heading. Flex wrapping centres every row, including
    the last one. Used by the industries section only. */
