@@ -39,7 +39,7 @@ let requirementsDB = [
     requiredSkills: 'CNC Programming, VMC operation, 6G TIG Welding',
     experienceRequired: '2-5 Years',
     salaryRange: '₹22,000 - ₹35,000 / month',
-    employment Type: 'Contractual Staffing',
+    employmentType: 'Contractual Staffing',
     joiningDate: '2026-08-15',
     jobDescription: 'Required 25 certified CNC operators for 3-shift factory operation in Pune industrial zone.',
     jdFileUrl: 'https://cloudinary.com/sample_jd_apex.pdf',
