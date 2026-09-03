@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { jsPDF } from 'jspdf';
-import * as XLSX from 'xlsx';
 import logo from './assets/logo.jpeg';
 import {
   Users, Building2, Cpu, ShieldCheck, HardHat, HeartPulse, Truck,
   UtensilsCrossed, Briefcase, PhoneCall, Mail, MapPin, Clock,
   CheckCircle2, ArrowRight, Send, Globe, Wrench, ChevronDown,
-  Shield, Phone, Award, Search, Download, Trash2, Lock, Upload,
+  Shield, Phone, Award, Upload,
   FileText, CreditCard, Building, HelpCircle, Star, Menu, X,
   Bug, Monitor, Tag, Code, Layers, Headphones, Handshake
 } from 'lucide-react';
@@ -81,7 +79,6 @@ export default function App() {
   const [openFaq, setOpenFaq] = useState(null);
 
   const [showRequestModal, setShowRequestModal] = useState(false);
-  const [showAdminModal, setShowAdminModal] = useState(false);
   const [showCareersModal, setShowCareersModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,11 +97,6 @@ export default function App() {
   const [careerData, setCareerData] = useState({
     name: '', phone: '', email: '', role: 'General Manpower Supply', resumeFileName: ''
   });
-
-  const [adminToken, setAdminToken] = useState('');
-  const [adminLoginCreds, setAdminLoginCreds] = useState({ username: 'admin', password: 'nexus2026' });
-  const [adminRequests, setAdminRequests] = useState([]);
-  const [adminSearch, setAdminSearch] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -135,8 +127,6 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       }).catch(() => {});
-      const record = { id: 'req-' + Date.now(), createdAt: new Date().toISOString(), ...formData, status: 'Pending' };
-      setAdminRequests(prev => [record, ...prev]);
     } catch (_) {}
     setIsSubmitting(false);
     setSubmittedData(formData);
@@ -148,48 +138,6 @@ export default function App() {
     e.preventDefault();
     alert(`Thank you ${careerData.name}! We received your application for ${careerData.role}. Our team will contact you soon.`);
     setShowCareersModal(false);
-  };
-
-  const handleAdminLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(`${API_BASE}/admin/login`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(adminLoginCreds)
-      });
-      const data = await res.json();
-      if (data.success) { setAdminToken(data.token); fetchAdminData(); }
-      else setAdminToken('demo-admin-token');
-    } catch { setAdminToken('demo-admin-token'); }
-  };
-
-  const fetchAdminData = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/admin/requirements`);
-      const data = await res.json();
-      if (data.success && data.data?.length) setAdminRequests(data.data);
-    } catch (_) {}
-  };
-
-  const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(adminRequests);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Requirements');
-    XLSX.writeFile(wb, 'Nexus_Origin_Requirements.xlsx');
-  };
-
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(14);
-    doc.text('Nexus Origin Solution — Requirements Report', 14, 20);
-    let y = 35;
-    adminRequests.forEach((r, i) => {
-      if (y > 270) { doc.addPage(); y = 20; }
-      doc.setFontSize(10);
-      doc.text(`${i + 1}. ${r.companyName} | ${r.jobPosition} (${r.employeesRequired}) | ${r.phone}`, 14, y);
-      y += 8;
-    });
-    doc.save('Nexus_Origin_Report.pdf');
   };
 
   const filteredServices = activeCategory === 'all'
@@ -213,12 +161,6 @@ export default function App() {
     setShowAllServices(false);
     document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  const filteredAdmin = adminRequests.filter(r =>
-    r.companyName?.toLowerCase().includes(adminSearch.toLowerCase()) ||
-    r.contactPerson?.toLowerCase().includes(adminSearch.toLowerCase()) ||
-    r.jobPosition?.toLowerCase().includes(adminSearch.toLowerCase())
-  );
 
   return (
     <div>
@@ -622,9 +564,6 @@ export default function App() {
           </div>
           <div className="footer-bottom">
             <span>© {new Date().getFullYear()} Nexus Origin Solution. All rights reserved.</span>
-            <button onClick={() => setShowAdminModal(true)}>
-              Admin Panel
-            </button>
           </div>
         </div>
       </footer>
@@ -800,84 +739,6 @@ export default function App() {
         </div>
       )}
 
-      {/* ADMIN MODAL */}
-      {showAdminModal && (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowAdminModal(false)}>
-          <div className="modal modal-lg">
-            <button className="modal-close" onClick={() => setShowAdminModal(false)}><X size={18} /></button>
-            {!adminToken ? (
-              <div style={{ maxWidth: 360, margin: '0 auto', textAlign: 'center' }}>
-                <Lock size={32} style={{ color: '#1A365D', marginBottom: 16 }} />
-                <h2>Admin Login</h2>
-                <p className="modal-sub">Manage submitted requirements</p>
-                <form onSubmit={handleAdminLogin}>
-                  <div className="form-group">
-                    <label>Username</label>
-                    <input className="form-input" value={adminLoginCreds.username}
-                      onChange={e => setAdminLoginCreds({ ...adminLoginCreds, username: e.target.value })} />
-                  </div>
-                  <div className="form-group">
-                    <label>Password</label>
-                    <input className="form-input" type="password" value={adminLoginCreds.password}
-                      onChange={e => setAdminLoginCreds({ ...adminLoginCreds, password: e.target.value })} />
-                  </div>
-                  <button type="submit" className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>Login</button>
-                </form>
-              </div>
-            ) : (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-                  <h2>Requirements ({filteredAdmin.length})</h2>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="btn-outline" onClick={exportToExcel} style={{ fontSize: 'var(--text-meta)', padding: '8px 16px' }}>
-                      <Download size={14} /> Excel
-                    </button>
-                    <button className="btn-outline" onClick={exportToPDF} style={{ fontSize: 'var(--text-meta)', padding: '8px 16px' }}>
-                      <Download size={14} /> PDF
-                    </button>
-                  </div>
-                </div>
-                <input className="form-input" placeholder="Search..." value={adminSearch}
-                  onChange={e => setAdminSearch(e.target.value)} style={{ marginBottom: 16 }} />
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', fontSize: 'var(--text-sm)', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid var(--sand)', textAlign: 'left' }}>
-                        <th style={{ padding: 8 }}>Company</th>
-                        <th style={{ padding: 8 }}>Contact</th>
-                        <th style={{ padding: 8 }}>Service</th>
-                        <th style={{ padding: 8 }}>Qty</th>
-                        <th style={{ padding: 8 }}>City</th>
-                        <th style={{ padding: 8 }}></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredAdmin.map(req => (
-                        <tr key={req.id} style={{ borderBottom: '1px solid var(--sand)' }}>
-                          <td style={{ padding: 8, fontWeight: 600 }}>{req.companyName}</td>
-                          <td style={{ padding: 8 }}>{req.contactPerson}<br /><span style={{ color: '#C05621', fontSize: 'var(--text-micro)' }}>{req.phone}</span></td>
-                          <td style={{ padding: 8 }}>{req.jobPosition}</td>
-                          <td style={{ padding: 8 }}>{req.employeesRequired}</td>
-                          <td style={{ padding: 8 }}>{req.city}</td>
-                          <td style={{ padding: 8 }}>
-                            <button onClick={() => setAdminRequests(prev => prev.filter(r => r.id !== req.id))}
-                              style={{ background: 'none', border: 'none', color: '#C05621', cursor: 'pointer' }}>
-                              <Trash2 size={16} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                      {filteredAdmin.length === 0 && (
-                        <tr><td colSpan={6} style={{ padding: 24, textAlign: 'center', color: 'var(--warm-gray)' }}>No requirements yet</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
